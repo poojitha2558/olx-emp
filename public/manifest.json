@@ -1,0 +1,24 @@
+{
+  "name": "OLX EMP",
+  "short_name": "OLX EMP",
+  "description": "OLX Employee Management Portal",
+  "id": "/",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLERv7Q5i7CQAMkq3pgx6jww2IqAB5E76unw&s",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLERv7Q5i7CQAMkq3pgx6jww2IqAB5E76unw&s",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
