@@ -63,7 +63,7 @@ export function UpdateBanner() {
 
   return (
     <div className="fixed bottom-20 left-4 right-4 z-50 md:left-auto md:right-4 md:w-96">
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl shadow-2xl p-4 border border-purple-400">
+      <div className="bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-xl shadow-2xl p-4 border border-blue-400">
         <div className="flex items-start gap-3">
           <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
             <svg
@@ -82,13 +82,13 @@ export function UpdateBanner() {
           </div>
           <div className="flex-1">
             <h3 className="font-bold text-sm mb-1">New Version Available!</h3>
-            <p className="text-xs text-purple-100 mb-3">
+            <p className="text-xs text-blue-100 mb-3">
               A new version of OLX EMP is ready. Update now for the latest features and improvements.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={handleUpdate}
-                className="flex-1 bg-white text-purple-600 py-2 px-4 rounded-lg text-sm font-bold hover:bg-purple-50 transition-colors"
+                className="flex-1 bg-white text-blue-600 py-2 px-4 rounded-lg text-sm font-bold hover:bg-blue-50 transition-colors"
               >
                 Update Now
               </button>

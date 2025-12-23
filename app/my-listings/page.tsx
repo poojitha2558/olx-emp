@@ -84,7 +84,7 @@ export default function MyListingsPage() {
             </div>
             <Link
               href="/post"
-              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+              className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all"
             >
               + New
             </Link>
@@ -92,8 +92,8 @@ export default function MyListingsPage() {
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-3 mb-4">
-            <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold text-purple-600">{listings.length}</p>
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 text-center">
+              <p className="text-2xl font-bold text-blue-600">{listings.length}</p>
               <p className="text-xs text-gray-600">Total</p>
             </div>
             <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-3 text-center">
@@ -118,8 +118,8 @@ export default function MyListingsPage() {
                 onClick={() => setFilter(tab.key as any)}
                 className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
                   filter === tab.key
-                    ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
-                    : "bg-white text-gray-700 border border-gray-300 hover:border-purple-500"
+                    ? "bg-gradient-to-r from-blue-500 to-blue-700 text-white shadow-lg"
+                    : "bg-white text-gray-700 border border-gray-300 hover:border-blue-500"
                 }`}
               >
                 {tab.label}
@@ -140,7 +140,7 @@ export default function MyListingsPage() {
             <p className="text-gray-500 mb-4">Start selling by posting your first item</p>
             <Link
               href="/post"
-              className="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+              className="inline-block bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
             >
               Post an Item
             </Link>
@@ -171,7 +171,7 @@ export default function MyListingsPage() {
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <h3 className="font-bold text-gray-900 text-lg mb-1">{listing.title}</h3>
-                        <p className="text-2xl font-bold text-purple-600 mb-2">
+                        <p className="text-2xl font-bold text-blue-600 mb-2">
                           ₹{listing.price.toLocaleString("en-IN")}
                         </p>
                         <div className="flex items-center gap-4 text-sm text-gray-600">
@@ -278,26 +278,26 @@ export default function MyListingsPage() {
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-around items-center h-16">
-            <Link href="/home" className="flex flex-col items-center gap-1 text-gray-600 hover:text-purple-600">
+            <Link href="/home" className="flex flex-col items-center gap-1 text-gray-600 hover:text-blue-600">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
               <span className="text-xs font-medium">Home</span>
             </Link>
-            <Link href="/my-listings" className="flex flex-col items-center gap-1 text-purple-600">
+            <Link href="/my-listings" className="flex flex-col items-center gap-1 text-blue-600">
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
                 <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
               </svg>
               <span className="text-xs font-medium">My Listings</span>
             </Link>
-            <Link href="/chat" className="flex flex-col items-center gap-1 text-gray-600 hover:text-purple-600">
+            <Link href="/chat" className="flex flex-col items-center gap-1 text-gray-600 hover:text-blue-600">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
               <span className="text-xs font-medium">Chat</span>
             </Link>
-            <Link href="/profile" className="flex flex-col items-center gap-1 text-gray-600 hover:text-purple-600">
+            <Link href="/profile" className="flex flex-col items-center gap-1 text-gray-600 hover:text-blue-600">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>

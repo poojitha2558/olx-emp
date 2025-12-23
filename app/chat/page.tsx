@@ -123,13 +123,20 @@ function ChatContent() {
     <div className="h-screen bg-gray-50 flex flex-col">
       {/* Header */}
       <header className="bg-white shadow-sm z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/home" className="p-2 hover:bg-gray-100 rounded-full transition-colors lg:hidden">
+            <Link href="/home" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
               <svg className="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </Link>
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Logo_OLX_-_OK.png"
+              alt="OLX"
+              width={40}
+              height={40}
+              className="object-contain"
+            />
             <div>
               <h1 className="text-lg font-bold text-gray-900">Messages</h1>
               <p className="text-xs text-gray-500">Internal chat only</p>
@@ -149,7 +156,7 @@ function ChatContent() {
               <input
                 type="text"
                 placeholder="Search chats..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                className="w-full pl-10 pr-4 py-2 border text-gray-900 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               />
             </div>
           </div>
@@ -160,10 +167,10 @@ function ChatContent() {
                 key={chat.id}
                 onClick={() => setSelectedChat(chat.id)}
                 className={`w-full p-4 flex items-start gap-3 hover:bg-gray-50 transition-colors border-b border-gray-100 ${
-                  selectedChat === chat.id ? "bg-purple-50" : ""
+                  selectedChat === chat.id ? "bg-blue-50" : ""
                 }`}
               >
-                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                   {chat.avatar}
                 </div>
                 <div className="flex-1 min-w-0 text-left">
@@ -175,7 +182,7 @@ function ChatContent() {
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-gray-600 truncate flex-1">{chat.lastMessage}</p>
                     {chat.unread > 0 && (
-                      <span className="ml-2 bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center flex-shrink-0">
+                      <span className="ml-2 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center flex-shrink-0">
                         {chat.unread}
                       </span>
                     )}
@@ -200,7 +207,7 @@ function ChatContent() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold">
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold">
                   {currentChat?.avatar}
                 </div>
                 <div>
@@ -227,7 +234,7 @@ function ChatContent() {
               <div className="flex justify-center">
                 <div className="bg-white rounded-lg shadow-sm p-3 max-w-xs text-center">
                   <p className="text-xs text-gray-500 mb-1">Chatting about</p>
-                  <p className="text-sm font-semibold text-purple-600">{currentChat?.itemTitle}</p>
+                  <p className="text-sm font-semibold text-blue-600">{currentChat?.itemTitle}</p>
                 </div>
               </div>
 
@@ -237,7 +244,7 @@ function ChatContent() {
                     <div
                       className={`rounded-2xl px-4 py-2 ${
                         msg.isOwn
-                          ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+                          ? "bg-gradient-to-r from-blue-500 to-blue-700 text-white"
                           : "bg-white shadow-sm text-gray-900"
                       }`}
                     >
@@ -261,12 +268,12 @@ function ChatContent() {
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                   placeholder="Type a message..."
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                  className="flex-1 px-4 py-3 border border-gray-300 text-gray-900 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={!newMessage.trim()}
-                  className="h-12 w-12 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center"
+                  className="h-12 w-12 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -304,7 +311,7 @@ function ChatContent() {
                     alert(`User reported for: ${reason}`);
                     setShowReportModal(false);
                   }}
-                  className="w-full text-left px-4 py-3 border border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors"
+                  className="w-full text-left px-4 py-3 border text-gray-900 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
                 >
                   {reason}
                 </button>
@@ -327,7 +334,7 @@ export default function ChatPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-600 border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
       </div>
     }>
       <ChatContent />

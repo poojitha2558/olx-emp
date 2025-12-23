@@ -29,7 +29,7 @@ const MOCK_REPORTED_USERS = [
     id: 1,
     name: "John Doe",
     department: "Marketing",
-    reportedBy: "Sneha Reddy",
+    reportedBy: "Vidhya",
     reason: "Harassment",
     date: "1 day ago",
     status: "under_review"
@@ -263,7 +263,7 @@ export default function AdminPage() {
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold">
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold">
                           {report.name.charAt(0)}
                         </div>
                         <div>
@@ -329,14 +329,14 @@ export default function AdminPage() {
               </div>
             ) : (
               flaggedChats.map((chat) => (
-                <div key={chat.id} className="bg-white rounded-xl shadow-sm p-4 border-l-4 border-purple-500">
+                <div key={chat.id} className="bg-white rounded-xl shadow-sm p-4 border-l-4 border-blue-500">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <h3 className="font-bold text-gray-900 mb-1">
                         Chat between {chat.participants.join(" & ")}
                       </h3>
                       <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                        <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-medium">
+                        <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
                           {chat.reason}
                         </span>
                         <span>•</span>
