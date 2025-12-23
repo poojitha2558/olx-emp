@@ -146,7 +146,7 @@ export default function ItemDetailPage() {
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
                     className={`relative h-24 rounded-lg overflow-hidden border-2 transition-all ${
-                      currentImageIndex === index ? "border-purple-600" : "border-transparent"
+                      currentImageIndex === index ? "border-blue-600" : "border-transparent"
                     }`}
                   >
                     <img src={img} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-cover" />
@@ -190,14 +190,14 @@ export default function ItemDetailPage() {
             {/* Price Card */}
             <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24">
               <h1 className="text-2xl font-bold text-gray-900 mb-2">{MOCK_ITEM.title}</h1>
-              <p className="text-4xl font-bold text-purple-600 mb-6">
+              <p className="text-4xl font-bold text-blue-600 mb-6">
                 ₹{MOCK_ITEM.price.toLocaleString("en-IN")}
               </p>
 
               {/* Seller Info */}
               <div className="mb-6 p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg">
+                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-lg">
                     {MOCK_ITEM.seller.name.charAt(0)}
                   </div>
                   <div>
@@ -217,7 +217,7 @@ export default function ItemDetailPage() {
               <div className="space-y-3">
                 <button
                   onClick={handleChatWithSeller}
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 px-6 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+                  className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white py-3 px-6 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -226,7 +226,7 @@ export default function ItemDetailPage() {
                 </button>
                 <button
                   onClick={() => alert("Make Offer feature coming soon!")}
-                  className="w-full bg-white border-2 border-purple-600 text-purple-600 py-3 px-6 rounded-lg font-semibold hover:bg-purple-50 transition-colors"
+                  className="w-full bg-white border-2 border-blue-600 text-blue-600 py-3 px-6 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
                 >
                   Make an Offer
                 </button>
@@ -266,7 +266,7 @@ export default function ItemDetailPage() {
                     alert(`Reported as: ${reason}`);
                     setShowReportModal(false);
                   }}
-                  className="w-full text-left px-4 py-3 border border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors"
+                  className="w-full text-left px-4 py-3 border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
                 >
                   {reason}
                 </button>

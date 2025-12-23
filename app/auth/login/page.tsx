@@ -69,7 +69,7 @@ function LoginForm() {
 
   if (success) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 font-sans px-4">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 font-sans px-4">
         <div className="flex w-full max-w-md flex-col items-center gap-6 rounded-2xl bg-white p-12 shadow-2xl text-center">
           <div className="relative">
             <div className="h-20 w-20 rounded-full bg-green-100 flex items-center justify-center">
@@ -86,14 +86,14 @@ function LoginForm() {
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Login Successful!</h2>
             <p className="text-gray-600">Redirecting to marketplace...</p>
           </div>
-          <div className="w-16 h-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full animate-pulse" />
+          <div className="w-16 h-1 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full animate-pulse" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 font-sans px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 font-sans px-4">
       <main className="flex w-full max-w-md flex-col items-center gap-8 rounded-2xl bg-white p-8 shadow-2xl sm:p-12">
         {/* Logo */}
         <div className="flex flex-col items-center gap-3">
@@ -130,14 +130,14 @@ function LoginForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your.name@company.com"
                 required
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
               />
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="w-full rounded-lg bg-gradient-to-r from-blue-500 to-blue-700 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -174,7 +174,7 @@ function LoginForm() {
               <button
                 type="button"
                 onClick={() => setOtpSent(false)}
-                className="text-purple-600 hover:text-purple-700 text-sm font-medium"
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
               >
                 Change
               </button>
@@ -193,7 +193,7 @@ function LoginForm() {
                 placeholder="000000"
                 maxLength={6}
                 required
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-center text-2xl font-mono tracking-widest text-gray-900 placeholder-gray-300 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-center text-2xl font-mono tracking-widest text-gray-900 placeholder-gray-300 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
               />
               {error && (
                 <p className="text-sm text-red-600 flex items-center gap-1">
@@ -208,7 +208,7 @@ function LoginForm() {
             <button
               type="submit"
               disabled={isLoading || otp.length !== 6}
-              className="w-full rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="w-full rounded-lg bg-gradient-to-r from-blue-500 to-blue-700 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -229,7 +229,7 @@ function LoginForm() {
                 type="button"
                 onClick={handleResendOTP}
                 disabled={countdown > 0}
-                className="text-sm text-gray-600 hover:text-purple-600 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
+                className="text-sm text-gray-600 hover:text-blue-600 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
               >
                 {countdown > 0 ? (
                   <span className="flex items-center justify-center gap-1">
@@ -264,7 +264,7 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-purple-500 via-blue-600 to-indigo-700 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
       </div>
     }>

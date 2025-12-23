@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, ChangeEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -89,7 +89,7 @@ export default function PostItemPage() {
           </div>
           <button
             onClick={() => setShowPreview(true)}
-            className="text-purple-600 hover:text-purple-700 font-medium text-sm"
+            className="text-blue-600 hover:text-blue-700 font-medium text-sm"
           >
             Preview
           </button>
@@ -120,7 +120,7 @@ export default function PostItemPage() {
                 </div>
               ))}
               {images.length < 5 && (
-                <label className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-colors">
+                <label className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
                   <svg className="w-8 h-8 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
@@ -149,7 +149,7 @@ export default function PostItemPage() {
               value={formData.title}
               onChange={(e) => handleInputChange("title", e.target.value)}
               placeholder="e.g., iPhone 13 Pro - Excellent Condition"
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20 ${
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none text-gray-900 focus:ring-2 focus:ring-purple-500/20 ${
                 errors.title ? "border-red-500" : "border-gray-300"
               }`}
             />
@@ -166,7 +166,7 @@ export default function PostItemPage() {
                 id="category"
                 value={formData.category}
                 onChange={(e) => handleInputChange("category", e.target.value)}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20 ${
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none text-gray-900 focus:ring-2 focus:ring-purple-500/20 ${
                   errors.category ? "border-red-500" : "border-gray-300"
                 }`}
               >
@@ -190,7 +190,7 @@ export default function PostItemPage() {
                 value={formData.price}
                 onChange={(e) => handleInputChange("price", e.target.value)}
                 placeholder="0"
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20 ${
+                className={`w-full px-4 py-3 border rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20 ${
                   errors.price ? "border-red-500" : "border-gray-300"
                 }`}
               />
@@ -207,7 +207,7 @@ export default function PostItemPage() {
               id="location"
               value={formData.location}
               onChange={(e) => handleInputChange("location", e.target.value)}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20 ${
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none text-gray-900 focus:ring-2 focus:ring-purple-500/20 ${
                 errors.location ? "border-red-500" : "border-gray-300"
               }`}
             >
@@ -232,7 +232,7 @@ export default function PostItemPage() {
               onChange={(e) => handleInputChange("description", e.target.value)}
               placeholder="Describe your item in detail..."
               rows={6}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20 resize-none ${
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none text-gray-900 focus:ring-2 focus:ring-blue-500/20 resize-none ${
                 errors.description ? "border-red-500" : "border-gray-300"
               }`}
             />
@@ -246,7 +246,7 @@ export default function PostItemPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 px-6 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white py-4 px-6 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {isSubmitting ? (
               <span className="flex items-center justify-center gap-2">
@@ -271,7 +271,7 @@ export default function PostItemPage() {
               <h3 className="text-lg font-bold text-gray-900">Preview</h3>
               <button
                 onClick={() => setShowPreview(false)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-gray-500 rounded-full transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -285,7 +285,7 @@ export default function PostItemPage() {
                 </div>
               )}
               <h2 className="text-2xl font-bold text-gray-900 mb-2">{formData.title || "No title"}</h2>
-              <p className="text-3xl font-bold text-purple-600 mb-4">
+              <p className="text-3xl font-bold text-blue-600 mb-4">
                 ₹{formData.price ? Number(formData.price).toLocaleString("en-IN") : "0"}
               </p>
               <div className="space-y-2 mb-4">

@@ -9,8 +9,8 @@ export default function ProfilePage() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const userProfile = {
-    name: "Sneha Reddy",
-    email: "sneha.reddy@company.com",
+    name: "vidhya",
+    email: "vidhya.reddy@company.com",
     department: "Engineering",
     employeeId: "EMP12345",
     joinedDate: "Jan 2024",
@@ -37,7 +37,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
-      <header className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+      <header className="bg-gradient-to-r from-blue-500 to-blue-700 text-white">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-6">
             <Link href="/home" className="p-2 hover:bg-white/20 rounded-full transition-colors">
@@ -51,12 +51,12 @@ export default function ProfilePage() {
 
           {/* Profile Header */}
           <div className="text-center">
-            <div className="h-24 w-24 rounded-full bg-white flex items-center justify-center text-purple-600 font-bold text-4xl mx-auto mb-4">
+            <div className="h-24 w-24 rounded-full bg-white flex items-center justify-center text-blue-600 font-bold text-4xl mx-auto mb-4">
               {userProfile.name.charAt(0)}
             </div>
             <h2 className="text-2xl font-bold mb-1">{userProfile.name}</h2>
-            <p className="text-purple-100 text-sm mb-1">{userProfile.department}</p>
-            <p className="text-purple-200 text-xs">Employee ID: {userProfile.employeeId}</p>
+            <p className="text-blue-100 text-sm mb-1">{userProfile.department}</p>
+            <p className="text-blue-200 text-xs mb-5">Employee ID: {userProfile.employeeId}</p>
           </div>
         </div>
       </header>
@@ -66,7 +66,7 @@ export default function ProfilePage() {
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <p className="text-2xl font-bold text-purple-600">{userProfile.totalListings}</p>
+              <p className="text-2xl font-bold text-blue-600">{userProfile.totalListings}</p>
               <p className="text-xs text-gray-600">Total Listings</p>
             </div>
             <div>
@@ -123,8 +123,8 @@ export default function ProfilePage() {
               className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors group"
             >
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-                  <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                   </svg>
                 </div>
@@ -153,7 +153,7 @@ export default function ProfilePage() {
                   <p className="text-xs text-gray-500">{userProfile.activeChats} conversations</p>
                 </div>
               </div>
-              <svg className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>
@@ -173,7 +173,7 @@ export default function ProfilePage() {
                   <p className="text-xs text-gray-500">Your bookmarks</p>
                 </div>
               </div>
-              <svg className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -216,7 +216,7 @@ export default function ProfilePage() {
                   <p className="text-xs text-gray-500">Moderation tools</p>
                 </div>
               </div>
-              <svg className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>
@@ -294,25 +294,25 @@ export default function ProfilePage() {
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-around items-center h-16">
-            <Link href="/home" className="flex flex-col items-center gap-1 text-gray-600 hover:text-purple-600">
+            <Link href="/home" className="flex flex-col items-center gap-1 text-gray-600 hover:text-blue-600">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
               <span className="text-xs font-medium">Home</span>
             </Link>
-            <Link href="/my-listings" className="flex flex-col items-center gap-1 text-gray-600 hover:text-purple-600">
+            <Link href="/my-listings" className="flex flex-col items-center gap-1 text-gray-600 hover:text-blue-600">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
               <span className="text-xs font-medium">My Listings</span>
             </Link>
-            <Link href="/chat" className="flex flex-col items-center gap-1 text-gray-600 hover:text-purple-600">
+            <Link href="/chat" className="flex flex-col items-center gap-1 text-gray-600 hover:text-blue-600">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
               <span className="text-xs font-medium">Chat</span>
             </Link>
-            <Link href="/profile" className="flex flex-col items-center gap-1 text-purple-600">
+            <Link href="/profile" className="flex flex-col items-center gap-1 text-blue-600">
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
               </svg>
