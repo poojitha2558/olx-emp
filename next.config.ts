@@ -1,15 +1,15 @@
 import type { NextConfig } from "next";
-import withPWAInit from "@ducanh2912/next-pwa";
+// import withPWAInit from "@ducanh2912/next-pwa";
 
-const withPWA = withPWAInit({
-  dest: "public",
-  register: true,
-  disable: false,
-});
+// Temporarily disabled PWA to avoid Turbopack/Webpack conflicts with MongoDB
+// const withPWA = withPWAInit({
+//   dest: "public",
+//   register: true,
+//   disable: false,
+// });
 
 const nextConfig: NextConfig = {
   /* config options here */
-  turbopack: {},
   images: {
     remotePatterns: [
       {
@@ -32,4 +32,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withPWA(nextConfig);
+export default nextConfig;

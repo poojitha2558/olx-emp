@@ -56,12 +56,37 @@ export default function PostItemPage() {
 
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Send data to API
+      const response = await fetch('/api/listings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          category: formData.category,
+          price: formData.price,
+          location: formData.location,
+          description: formData.description,
+          images: images,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Listing posted successfully!");
+        router.push("/home");
+      } else {
+        alert(data.error || "Failed to post listing");
+      }
+    } catch (error) {
+      console.error('Error posting listing:', error);
+      alert("An error occurred. Please try again.");
+    } finally {
       setIsSubmitting(false);
-      alert("Listing posted successfully!");
-      router.push("/home");
-    }, 2000);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
