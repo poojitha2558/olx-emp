@@ -1,78 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 const CATEGORIES = ["All", "Electronics", "Furniture", "Vehicles", "Books", "Misc"];
 
-const MOCK_LISTINGS = [
-  {
-    id: 1,
-    title: "iPhone 13 Pro - Excellent Condition",
-    price: 45000,
-    image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23667eea' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'%3EiPhone 13%3C/text%3E%3C/svg%3E",
-    location: "Mumbai Office",
-    department: "Engineering",
-    category: "Electronics",
-    seller: "Rahul Sharma"
-  },
-  {
-    id: 2,
-    title: "Office Chair - Herman Miller",
-    price: 15000,
-    image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23764ba2' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'%3EOffice Chair%3C/text%3E%3C/svg%3E",
-    location: "Bangalore Office",
-    department: "HR",
-    category: "Furniture",
-    seller: "Priya Patel"
-  },
-  {
-    id: 3,
-    title: "Honda City 2019 - Well Maintained",
-    price: 850000,
-    image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23f093fb' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'%3EHonda City%3C/text%3E%3C/svg%3E",
-    location: "Delhi Office",
-    department: "Sales",
-    category: "Vehicles",
-    seller: "Amit Kumar"
-  },
-  {
-    id: 4,
-    title: "MacBook Pro 16 inch M1",
-    price: 120000,
-    image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%234facfe' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'%3EMacBook Pro%3C/text%3E%3C/svg%3E",
-    location: "Mumbai Office",
-    department: "Design",
-    category: "Electronics",
-    seller: "Vidhya"
-  },
-  {
-    id: 5,
-    title: "Clean Code Book Set",
-    price: 2000,
-    image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%2300f2fe' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'%3EBooks%3C/text%3E%3C/svg%3E",
-    location: "Bangalore Office",
-    department: "Engineering",
-    category: "Books",
-    seller: "Vikram Singh"
-  },
-  {
-    id: 6,
-    title: "Standing Desk - Electric",
-    price: 25000,
-    image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%2343e97b' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'%3EStanding Desk%3C/text%3E%3C/svg%3E",
-    location: "Pune Office",
-    department: "Product",
-    category: "Furniture",
-    seller: "Anjali Gupta"
-  }
-];
+interface Listing {
+  _id: string;
+  title: string;
+  price: number;
+  category: string;
+  location: string;
+  description: string;
+  images: string[];
+  createdAt: string;
+}
 
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filteredListings = MOCK_LISTINGS.filter((item) => {
+  // Fetch listings from API
+  useEffect(() => {
+    async function fetchListings() {
+      try {
+        const response = await fetch('/api/listings');
+        const data = await response.json();
+        
+        if (data.success) {
+          setListings(data.listings);
+        }
+      } catch (error) {
+        console.error('Error fetching listings:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchListings();
+  }, []);
+
+  const filteredListings = listings.filter((item) => {
     const matchesCategory = selectedCategory === "All" || item.category === selectedCategory;
     const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
@@ -161,7 +131,15 @@ export default function HomePage() {
           </p>
         </div>
 
-        {filteredListings.length === 0 ? (
+        {isLoading ? (
+          <div className="text-center py-12">
+            <svg className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            <p className="text-gray-500">Loading listings...</p>
+          </div>
+        ) : filteredListings.length === 0 ? (
           <div className="text-center py-12">
             <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
@@ -173,13 +151,13 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredListings.map((item) => (
               <Link
-                key={item.id}
-                href={`/item/${item.id}`}
+                key={item._id}
+                href={`/item/${item._id}`}
                 className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow overflow-hidden group"
               >
                 <div className="relative h-48 bg-gray-200 overflow-hidden">
                   <img
-                    src={item.image}
+                    src={item.images[0] || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23667eea' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'%3ENo Image%3C/text%3E%3C/svg%3E"}
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -199,7 +177,9 @@ export default function HomePage() {
                     <span>{item.location}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">{item.department}</span>
+                    <span className="text-xs text-gray-500">
+                      {new Date(item.createdAt).toLocaleDateString()}
+                    </span>
                     <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
                       {item.category}
                     </span>

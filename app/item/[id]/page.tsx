@@ -1,42 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
-const MOCK_ITEM = {
-  id: 1,
-  title: "iPhone 13 Pro - Excellent Condition",
-  price: 45000,
-  images: [
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Crect fill='%23667eea' width='600' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='24' fill='white'%3EiPhone 13 Front%3C/text%3E%3C/svg%3E",
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Crect fill='%23764ba2' width='600' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='24' fill='white'%3EiPhone 13 Back%3C/text%3E%3C/svg%3E",
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Crect fill='%23f093fb' width='600' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='24' fill='white'%3EiPhone 13 Side%3C/text%3E%3C/svg%3E",
-  ],
-  location: "Mumbai Office",
-  department: "Engineering",
-  category: "Electronics",
-  seller: {
-    name: "Rahul Sharma",
-    department: "Engineering",
-    id: "emp123"
-  },
-  description: `Selling my iPhone 13 Pro in excellent condition. Barely used for 6 months.
-
-Features:
-- 256GB Storage
-- Graphite Color
-- Battery Health: 98%
-- No scratches or dents
-- Original box and accessories included
-- Apple Care+ valid till Dec 2024
-
-Reason for selling: Upgraded to iPhone 15 Pro
-
-Available for pickup at Mumbai office or can ship to other offices.`,
-  postedDate: "2 days ago",
-  views: 234
-};
+interface Listing {
+  _id: string;
+  title: string;
+  price: number;
+  images: string[];
+  location: string;
+  category: string;
+  description: string;
+  createdAt: string;
+  views?: number;
+  sellerName?: string;
+  sellerId?: string;
+}
 
 export default function ItemDetailPage() {
   const params = useParams();
@@ -44,9 +24,41 @@ export default function ItemDetailPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [listing, setListing] = useState<Listing | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch listing data
+  useEffect(() => {
+    async function fetchListing() {
+      try {
+        const response = await fetch(`/api/listings/${params.id}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setListing(data.listing);
+        } else {
+          alert('Listing not found');
+          router.push('/home');
+        }
+      } catch (error) {
+        console.error('Error fetching listing:', error);
+        alert('Error loading listing');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (params.id) {
+      fetchListing();
+    }
+  }, [params.id, router]);
 
   const handleChatWithSeller = () => {
-    router.push(`/chat?user=${MOCK_ITEM.seller.id}&item=${MOCK_ITEM.id}`);
+    if (listing?.sellerId) {
+      router.push(`/chat?user=${listing.sellerId}&item=${listing._id}`);
+    } else {
+      router.push('/chat');
+    }
   };
 
   const handleBookmark = () => {
@@ -92,6 +104,19 @@ export default function ItemDetailPage() {
         </div>
       </header>
 
+      {isLoading ? (
+        <div className="text-center py-12">
+          <svg className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+          </svg>
+          <p className="text-gray-500">Loading listing...</p>
+        </div>
+      ) : !listing ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500">Listing not found</p>
+        </div>
+      ) : (
       <main className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Images & Details */}
@@ -100,15 +125,15 @@ export default function ItemDetailPage() {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
               <div className="relative h-96 bg-gray-200">
                 <img
-                  src={MOCK_ITEM.images[currentImageIndex]}
-                  alt={MOCK_ITEM.title}
+                  src={listing.images[currentImageIndex] || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Crect fill='%23667eea' width='600' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='24' fill='white'%3ENo Image%3C/text%3E%3C/svg%3E"}
+                  alt={listing.title}
                   className="w-full h-full object-cover"
                 />
-                {MOCK_ITEM.images.length > 1 && (
+                {listing.images.length > 1 && (
                   <>
                     <button
                       onClick={() =>
-                        setCurrentImageIndex((prev) => (prev === 0 ? MOCK_ITEM.images.length - 1 : prev - 1))
+                        setCurrentImageIndex((prev) => (prev === 0 ? listing.images.length - 1 : prev - 1))
                       }
                       className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-colors"
                     >
@@ -118,7 +143,7 @@ export default function ItemDetailPage() {
                     </button>
                     <button
                       onClick={() =>
-                        setCurrentImageIndex((prev) => (prev === MOCK_ITEM.images.length - 1 ? 0 : prev + 1))
+                        setCurrentImageIndex((prev) => (prev === listing.images.length - 1 ? 0 : prev + 1))
                       }
                       className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-colors"
                     >
@@ -129,7 +154,7 @@ export default function ItemDetailPage() {
                   </>
                 )}
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                  {MOCK_ITEM.images.map((_, index) => (
+                  {listing.images.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
@@ -140,8 +165,9 @@ export default function ItemDetailPage() {
                   ))}
                 </div>
               </div>
+              {listing.images.length > 1 && (
               <div className="grid grid-cols-3 gap-2 p-4">
-                {MOCK_ITEM.images.map((img, index) => (
+                {listing.images.map((img, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
@@ -153,12 +179,13 @@ export default function ItemDetailPage() {
                   </button>
                 ))}
               </div>
+              )}
             </div>
 
             {/* Description */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Description</h2>
-              <p className="text-gray-700 whitespace-pre-line leading-relaxed">{MOCK_ITEM.description}</p>
+              <p className="text-gray-700 whitespace-pre-line leading-relaxed">{listing.description}</p>
             </div>
 
             {/* Details */}
@@ -167,19 +194,21 @@ export default function ItemDetailPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Category</p>
-                  <p className="font-medium text-gray-900">{MOCK_ITEM.category}</p>
+                  <p className="font-medium text-gray-900">{listing.category}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Location</p>
-                  <p className="font-medium text-gray-900">{MOCK_ITEM.location}</p>
+                  <p className="font-medium text-gray-900">{listing.location}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Posted</p>
-                  <p className="font-medium text-gray-900">{MOCK_ITEM.postedDate}</p>
+                  <p className="font-medium text-gray-900">
+                    {new Date(listing.createdAt).toLocaleDateString()}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Views</p>
-                  <p className="font-medium text-gray-900">{MOCK_ITEM.views}</p>
+                  <p className="font-medium text-gray-900">{listing.views || 0}</p>
                 </div>
               </div>
             </div>
@@ -189,20 +218,20 @@ export default function ItemDetailPage() {
           <div className="space-y-6">
             {/* Price Card */}
             <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">{MOCK_ITEM.title}</h1>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">{listing.title}</h1>
               <p className="text-4xl font-bold text-blue-600 mb-6">
-                ₹{MOCK_ITEM.price.toLocaleString("en-IN")}
+                ₹{listing.price.toLocaleString("en-IN")}
               </p>
 
               {/* Seller Info */}
               <div className="mb-6 p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-lg">
-                    {MOCK_ITEM.seller.name.charAt(0)}
+                    {listing.sellerName ? listing.sellerName.charAt(0) : 'S'}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{MOCK_ITEM.seller.name}</p>
-                    <p className="text-sm text-gray-600">{MOCK_ITEM.seller.department}</p>
+                    <p className="font-semibold text-gray-900">{listing.sellerName || 'Seller'}</p>
+                    <p className="text-sm text-gray-600">Employee</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -252,6 +281,7 @@ export default function ItemDetailPage() {
           </div>
         </div>
       </main>
+      )}
 
       {/* Report Modal */}
       {showReportModal && (
