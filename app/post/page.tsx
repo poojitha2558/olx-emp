@@ -1,14 +1,17 @@
 "use client";
 
-import { useState, FormEvent, ChangeEvent } from "react";
+import { useEffect, useState, FormEvent, ChangeEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 const CATEGORIES = ["Electronics", "Furniture", "Vehicles", "Books", "Jewelry", "Misc"];
 const OFFICES = ["Mumbai Office", "Bangalore Office", "Delhi Office", "Pune Office", "Hyderabad Office"];
 
 export default function PostItemPage() {
   const router = useRouter();
+  const { status } = useSession();
   const MAX_IMAGES = 5;
   const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024; // 2MB per image
 
@@ -122,6 +125,11 @@ export default function PostItemPage() {
         }),
       });
 
+      if (response.status === 401) {
+        router.replace("/auth/login?callbackUrl=/post");
+        return;
+      }
+
       const data = await response.json();
 
       if (response.ok) {
@@ -148,6 +156,12 @@ export default function PostItemPage() {
       setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/auth/login?callbackUrl=/post");
+    }
+  }, [status, router]);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -185,7 +199,13 @@ export default function PostItemPage() {
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-4">
               {images.map((img, index) => (
                 <div key={index} className="relative aspect-square">
-                  <img src={img} alt={`Upload ${index + 1}`} className="w-full h-full object-cover rounded-lg" />
+                  <Image
+                    src={img}
+                    alt={`Upload ${index + 1}`}
+                    fill
+                    sizes="(max-width: 640px) 33vw, 20vw"
+                    className="object-cover rounded-lg"
+                  />
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
@@ -324,7 +344,7 @@ export default function PostItemPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white py-4 px-6 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="w-full bg-linear-to-r from-blue-500 to-blue-700 text-white py-4 px-6 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {isSubmitting ? (
               <span className="flex items-center justify-center gap-2">
@@ -359,7 +379,13 @@ export default function PostItemPage() {
             <div className="p-6">
               {images.length > 0 && (
                 <div className="relative h-64 bg-gray-200 rounded-lg mb-4 overflow-hidden">
-                  <img src={images[0]} alt="Preview" className="w-full h-full object-cover" />
+                  <Image
+                    src={images[0]}
+                    alt="Preview"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 768px"
+                    className="object-cover"
+                  />
                 </div>
               )}
               <h2 className="text-2xl font-bold text-gray-900 mb-2">{formData.title || "No title"}</h2>

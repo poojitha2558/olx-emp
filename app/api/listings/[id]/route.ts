@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 
 export async function GET(
   request: NextRequest,
@@ -58,6 +60,12 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+    const userId = session?.user?.id;
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { id } = await params;
 
     if (!ObjectId.isValid(id)) {
@@ -74,14 +82,18 @@ export async function PATCH(
     const db = await getDatabase();
     const listingsCollection = db.collection('listings');
 
-    const result = await listingsCollection.updateOne(
+    const existing = await listingsCollection.findOne<{ sellerId?: string }>({ _id: new ObjectId(id) });
+    if (!existing) {
+      return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
+    }
+    if (String(existing.sellerId || '') !== String(userId)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    await listingsCollection.updateOne(
       { _id: new ObjectId(id) },
       { $set: { status: nextStatus, updatedAt: new Date() } }
     );
-
-    if (result.matchedCount === 0) {
-      return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
-    }
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
@@ -95,6 +107,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+    const userId = session?.user?.id;
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { id } = await params;
 
     if (!ObjectId.isValid(id)) {
@@ -104,15 +122,19 @@ export async function DELETE(
     const db = await getDatabase();
     const listingsCollection = db.collection('listings');
 
+    const existing = await listingsCollection.findOne<{ sellerId?: string }>({ _id: new ObjectId(id) });
+    if (!existing) {
+      return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
+    }
+    if (String(existing.sellerId || '') !== String(userId)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     // Soft-delete
-    const result = await listingsCollection.updateOne(
+    await listingsCollection.updateOne(
       { _id: new ObjectId(id) },
       { $set: { status: 'deleted', updatedAt: new Date() } }
     );
-
-    if (result.matchedCount === 0) {
-      return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
-    }
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {

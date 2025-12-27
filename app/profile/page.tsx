@@ -1,29 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
+
+type ListingStatus = "active" | "sold" | "deleted";
+
+type Listing = {
+  status: ListingStatus;
+};
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const userProfile = {
-    name: "vidhya",
-    email: "vidhya.reddy@company.com",
-    department: "Engineering",
-    employeeId: "EMP12345",
-    joinedDate: "Jan 2024",
-    totalListings: 8,
-    soldItems: 3,
-    activeChats: 5
-  };
+  const [listingStats, setListingStats] = useState({ total: 0, active: 0, sold: 0 });
 
-  const handleLogout = () => {
-    // Clear any stored auth tokens/data
-    localStorage.clear();
-    sessionStorage.clear();
-    router.push("/");
+  const displayName = useMemo(() => {
+    const name = session?.user?.name?.trim();
+    if (name) return name;
+    const email = session?.user?.email || "";
+    return email ? email.split("@")[0] : "";
+  }, [session?.user?.name, session?.user?.email]);
+
+  const email = session?.user?.email || "";
+
+  const initials = useMemo(() => {
+    const base = displayName || email;
+    if (!base) return "?";
+    return base.trim().charAt(0).toUpperCase();
+  }, [displayName, email]);
+
+  const handleLogout = async () => {
+    setShowLogoutModal(false);
+    await signOut({ callbackUrl: "/" });
   };
 
   const handleClearCache = async () => {
@@ -34,10 +46,36 @@ export default function ProfilePage() {
     }
   };
 
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/auth/login?callbackUrl=/profile");
+    }
+  }, [status, router]);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      const resp = await fetch("/api/listings?mine=1&status=all");
+      if (resp.status === 401) {
+        return;
+      }
+
+      const data = await resp.json().catch(() => null);
+      const listings: Listing[] = Array.isArray(data?.listings) ? data.listings : [];
+      const total = listings.length;
+      const active = listings.filter((l) => l.status === "active").length;
+      const sold = listings.filter((l) => l.status === "sold").length;
+      setListingStats({ total, active, sold });
+    };
+
+    if (status === "authenticated") {
+      loadStats().catch((err) => console.error("Failed to load profile stats", err));
+    }
+  }, [status]);
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
-      <header className="bg-gradient-to-r from-blue-500 to-blue-700 text-white">
+      <header className="bg-linear-to-r from-blue-500 to-blue-700 text-white">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-6">
             <Link href="/home" className="p-2 hover:bg-white/20 rounded-full transition-colors">
@@ -52,11 +90,10 @@ export default function ProfilePage() {
           {/* Profile Header */}
           <div className="text-center">
             <div className="h-24 w-24 rounded-full bg-white flex items-center justify-center text-blue-600 font-bold text-4xl mx-auto mb-4">
-              {userProfile.name.charAt(0)}
+              {initials}
             </div>
-            <h2 className="text-2xl font-bold mb-1">{userProfile.name}</h2>
-            <p className="text-blue-100 text-sm mb-1">{userProfile.department}</p>
-            <p className="text-blue-200 text-xs mb-5">Employee ID: {userProfile.employeeId}</p>
+            <h2 className="text-2xl font-bold mb-1">{displayName || "Profile"}</h2>
+            <p className="text-blue-100 text-sm mb-5">{email}</p>
           </div>
         </div>
       </header>
@@ -66,16 +103,16 @@ export default function ProfilePage() {
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <p className="text-2xl font-bold text-blue-600">{userProfile.totalListings}</p>
-              <p className="text-xs text-gray-600">Total Listings</p>
+              <p className="text-2xl font-bold text-blue-600">{listingStats.total}</p>
+              <p className="text-xs text-gray-600">Total</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-green-600">{userProfile.soldItems}</p>
-              <p className="text-xs text-gray-600">Sold Items</p>
+              <p className="text-2xl font-bold text-green-600">{listingStats.active}</p>
+              <p className="text-xs text-gray-600">Active</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-blue-600">{userProfile.activeChats}</p>
-              <p className="text-xs text-gray-600">Active Chats</p>
+              <p className="text-2xl font-bold text-gray-600">{listingStats.sold}</p>
+              <p className="text-xs text-gray-600">Sold</p>
             </div>
           </div>
         </div>
@@ -89,27 +126,15 @@ export default function ProfilePage() {
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <div>
                 <p className="text-sm text-gray-500">Full Name</p>
-                <p className="font-medium text-gray-900">{userProfile.name}</p>
+                <p className="font-medium text-gray-900">{displayName || "—"}</p>
               </div>
             </div>
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <div>
                 <p className="text-sm text-gray-500">Email Address</p>
-                <p className="font-medium text-gray-900">{userProfile.email}</p>
+                <p className="font-medium text-gray-900">{email || "—"}</p>
               </div>
               <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">Verified</span>
-            </div>
-            <div className="flex items-center justify-between py-3 border-b border-gray-100">
-              <div>
-                <p className="text-sm text-gray-500">Department</p>
-                <p className="font-medium text-gray-900">{userProfile.department}</p>
-              </div>
-            </div>
-            <div className="flex items-center justify-between py-3">
-              <div>
-                <p className="text-sm text-gray-500">Member Since</p>
-                <p className="font-medium text-gray-900">{userProfile.joinedDate}</p>
-              </div>
             </div>
           </div>
         </div>
@@ -130,7 +155,7 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">My Listings</p>
-                  <p className="text-xs text-gray-500">{userProfile.totalListings} items</p>
+                  <p className="text-xs text-gray-500">{listingStats.total} items</p>
                 </div>
               </div>
               <svg className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -150,7 +175,7 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">Messages</p>
-                  <p className="text-xs text-gray-500">{userProfile.activeChats} conversations</p>
+                  <p className="text-xs text-gray-500">Your conversations</p>
                 </div>
               </div>
               <svg className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -243,7 +268,7 @@ export default function ProfilePage() {
         {/* Security Notice */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
           <div className="flex items-start gap-3">
-            <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
             <div className="text-sm text-blue-900">

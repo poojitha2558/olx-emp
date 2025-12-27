@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 type ListingStatus = "active" | "sold" | "deleted";
 
@@ -20,15 +23,33 @@ const FALLBACK_IMAGE =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23667eea' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'%3ENo Image%3C/text%3E%3C/svg%3E";
 
 export default function MyListingsPage() {
+  const router = useRouter();
+  const { status } = useSession();
   const [listings, setListings] = useState<Listing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "active" | "sold">("all");
   const [showDeleteModal, setShowDeleteModal] = useState<string | null>(null);
 
+  const tabs = useMemo(
+    () =>
+      [
+        { key: "all", label: "All" },
+        { key: "active", label: "Active" },
+        { key: "sold", label: "Sold" },
+      ] as const,
+    [],
+  );
+
   const fetchListings = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("/api/listings?status=all");
+      const response = await fetch("/api/listings?mine=1&status=all");
+
+      if (response.status === 401) {
+        router.replace("/auth/login?callbackUrl=/my-listings");
+        return;
+      }
+
       const data = await response.json();
       if (data?.success && Array.isArray(data.listings)) {
         setListings(data.listings);
@@ -44,8 +65,15 @@ export default function MyListingsPage() {
   };
 
   useEffect(() => {
-    fetchListings();
-  }, []);
+    if (status === "unauthenticated") {
+      router.replace("/auth/login?callbackUrl=/my-listings");
+      return;
+    }
+
+    if (status === "authenticated") {
+      fetchListings();
+    }
+  }, [status, router]);
 
   const filteredListings = listings.filter((listing) => {
     if (filter === "all") return true;
@@ -59,6 +87,11 @@ export default function MyListingsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "sold" }),
       });
+
+      if (response.status === 401) {
+        router.replace("/auth/login?callbackUrl=/my-listings");
+        return;
+      }
 
       if (!response.ok) {
         const data = await response.json().catch(() => null);
@@ -78,6 +111,11 @@ export default function MyListingsPage() {
       const response = await fetch(`/api/listings/${id}`, {
         method: "DELETE",
       });
+
+      if (response.status === 401) {
+        router.replace("/auth/login?callbackUrl=/my-listings");
+        return;
+      }
 
       if (!response.ok) {
         const data = await response.json().catch(() => null);
@@ -115,7 +153,7 @@ export default function MyListingsPage() {
             </div>
             <Link
               href="/post"
-              className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+              className="bg-linear-to-r from-blue-500 to-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all"
             >
               + New
             </Link>
@@ -123,15 +161,15 @@ export default function MyListingsPage() {
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-3 mb-4">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 text-center">
+            <div className="bg-linear-to-br from-blue-50 to-blue-100 rounded-lg p-3 text-center">
               <p className="text-2xl font-bold text-blue-600">{listings.length}</p>
               <p className="text-xs text-gray-600">Total</p>
             </div>
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-3 text-center">
+            <div className="bg-linear-to-br from-green-50 to-emerald-50 rounded-lg p-3 text-center">
               <p className="text-2xl font-bold text-green-600">{activeCount}</p>
               <p className="text-xs text-gray-600">Active</p>
             </div>
-            <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-lg p-3 text-center">
+            <div className="bg-linear-to-br from-gray-50 to-slate-50 rounded-lg p-3 text-center">
               <p className="text-2xl font-bold text-gray-600">{soldCount}</p>
               <p className="text-xs text-gray-600">Sold</p>
             </div>
@@ -139,17 +177,13 @@ export default function MyListingsPage() {
 
           {/* Filter Tabs */}
           <div className="flex gap-2">
-            {[
-              { key: "all", label: "All" },
-              { key: "active", label: "Active" },
-              { key: "sold", label: "Sold" }
-            ].map((tab) => (
+            {tabs.map((tab) => (
               <button
                 key={tab.key}
-                onClick={() => setFilter(tab.key as any)}
+                onClick={() => setFilter(tab.key)}
                 className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
                   filter === tab.key
-                    ? "bg-gradient-to-r from-blue-500 to-blue-700 text-white shadow-lg"
+                    ? "bg-linear-to-r from-blue-500 to-blue-700 text-white shadow-lg"
                     : "bg-white text-gray-700 border border-gray-300 hover:border-blue-500"
                 }`}
               >
@@ -179,7 +213,7 @@ export default function MyListingsPage() {
             <p className="text-gray-500 mb-4">Start selling by posting your first item</p>
             <Link
               href="/post"
-              className="inline-block bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+              className="inline-block bg-linear-to-r from-blue-500 to-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
             >
               Post an Item
             </Link>
@@ -190,11 +224,13 @@ export default function MyListingsPage() {
               <div key={listing._id} className="bg-white rounded-xl shadow-sm overflow-hidden">
                 <div className="flex flex-col sm:flex-row">
                   {/* Image */}
-                  <div className="relative h-48 sm:h-auto sm:w-48 bg-gray-200 flex-shrink-0">
-                    <img
+                  <div className="relative h-48 sm:h-auto sm:w-48 bg-gray-200 shrink-0">
+                    <Image
                       src={listing.images?.[0] || FALLBACK_IMAGE}
                       alt={listing.title}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="(max-width: 640px) 100vw, 192px"
+                      className="object-cover"
                     />
                     {listing.status === "sold" && (
                       <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
@@ -225,7 +261,7 @@ export default function MyListingsPage() {
                           <span>{new Date(listing.createdAt).toLocaleDateString()}</span>
                         </div>
                       </div>
-                      <span className={`ml-3 px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
+                      <span className={`ml-3 px-3 py-1 rounded-full text-xs font-medium shrink-0 ${
                         listing.status === "active"
                           ? "bg-green-100 text-green-700"
                           : "bg-gray-100 text-gray-700"

@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/mongodb';
 import { validateListing, createListing, IListing } from '@/models/Listing';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    const userId = session?.user?.id;
+    const userEmail = session?.user?.email;
+    const userName = session?.user?.name;
+
+    if (!userId || !userEmail) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     
     // Validate using schema
@@ -28,9 +39,9 @@ export async function POST(request: NextRequest) {
       location: body.location,
       description: body.description,
       images: body.images || [],
-      sellerId: body.sellerId,
-      sellerName: body.sellerName,
-      sellerEmail: body.sellerEmail,
+      sellerId: String(userId),
+      sellerName: userName || String(userEmail).split('@')[0],
+      sellerEmail: String(userEmail),
       status: 'active',
       views: 0,
       createdAt: new Date(),
@@ -66,8 +77,20 @@ export async function GET(request: NextRequest) {
     // Fetch listings (active by default, or filtered by ?status=...)
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
+    const mine = searchParams.get('mine');
+
+    const session = mine ? await getServerSession(authOptions) : null;
+    const userId = session?.user?.id;
 
     const query: Record<string, unknown> = {};
+
+    if (mine) {
+      if (!userId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      query.sellerId = String(userId);
+    }
+
     if (status && status !== 'all') {
       if (!['active', 'sold', 'deleted'].includes(status)) {
         return NextResponse.json(
@@ -76,7 +99,7 @@ export async function GET(request: NextRequest) {
         );
       }
       query.status = status;
-    } else {
+    } else if (!mine) {
       // default behavior for home page
       query.status = 'active';
     }

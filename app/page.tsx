@@ -15,7 +15,7 @@ export default function Home() {
 
     // Validate email domain
     const emailDomain = email.split("@")[1];
-    const allowedDomain = "company.com"; // Change this to your company domain
+    const allowedDomain = process.env.NEXT_PUBLIC_ALLOWED_EMAIL_DOMAIN || "company.com";
 
     if (!email.includes("@")) {
       setError("Please enter a valid email address");
@@ -29,12 +29,8 @@ export default function Home() {
       return;
     }
 
-    // Simulate auth redirect
-    setTimeout(() => {
-      setIsLoading(false);
-      // Redirect to auth/login page
-      window.location.href = `/auth/login?email=${encodeURIComponent(email)}`;
-    }, 1000);
+    setIsLoading(false);
+    window.location.href = `/auth/login?email=${encodeURIComponent(email)}`;
   };
 
   return (
