@@ -57,17 +57,31 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     // Get database connection
     const db = await getDatabase();
     const listingsCollection = db.collection('listings');
 
-    // Fetch all listings
-    const listings = await listingsCollection
-      .find({ status: 'active' })
-      .sort({ createdAt: -1 })
-      .toArray();
+    // Fetch listings (active by default, or filtered by ?status=...)
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get('status');
+
+    const query: Record<string, unknown> = {};
+    if (status && status !== 'all') {
+      if (!['active', 'sold', 'deleted'].includes(status)) {
+        return NextResponse.json(
+          { error: 'Invalid status filter' },
+          { status: 400 }
+        );
+      }
+      query.status = status;
+    } else {
+      // default behavior for home page
+      query.status = 'active';
+    }
+
+    const listings = await listingsCollection.find(query).sort({ createdAt: -1 }).toArray();
 
     return NextResponse.json(
       {
