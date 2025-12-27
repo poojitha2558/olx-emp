@@ -4,6 +4,7 @@ import "./globals.css";
 import { OfflineDetector } from "./components/OfflineDetector";
 import { UpdateBanner } from "./components/UpdateBanner";
 import { InstallPrompt } from "./components/InstallPrompt";
+import { AppSessionProvider } from "./components/SessionProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,7 +42,7 @@ export default function RootLayout({
         <OfflineDetector />
         <UpdateBanner />
         <InstallPrompt />
-        {children}
+        <AppSessionProvider>{children}</AppSessionProvider>
       </body>
     </html>
   );
