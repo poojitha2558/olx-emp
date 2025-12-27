@@ -4,11 +4,14 @@ import { useState, FormEvent, ChangeEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-const CATEGORIES = ["Electronics", "Furniture", "Vehicles", "Books", "Misc"];
+const CATEGORIES = ["Electronics", "Furniture", "Vehicles", "Books", "Jewelry", "Misc"];
 const OFFICES = ["Mumbai Office", "Bangalore Office", "Delhi Office", "Pune Office", "Hyderabad Office"];
 
 export default function PostItemPage() {
   const router = useRouter();
+  const MAX_IMAGES = 5;
+  const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024; // 2MB per image
+
   const [formData, setFormData] = useState({
     title: "",
     category: "",
@@ -21,12 +24,52 @@ export default function PostItemPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
-  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+  const readFileAsDataUrl = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(new Error("Failed to read image"));
+      reader.readAsDataURL(file);
+    });
+
+  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files) {
-      const newImages = Array.from(files).map((file) => URL.createObjectURL(file));
-      setImages((prev) => [...prev, ...newImages].slice(0, 5)); // Max 5 images
+    if (!files) return;
+
+    const availableSlots = Math.max(0, MAX_IMAGES - images.length);
+    if (availableSlots === 0) {
+      e.target.value = "";
+      return;
     }
+
+    const selectedFiles = Array.from(files).slice(0, availableSlots);
+    const accepted: string[] = [];
+    let rejectedForSize = 0;
+
+    for (const file of selectedFiles) {
+      if (file.size > MAX_IMAGE_SIZE_BYTES) {
+        rejectedForSize += 1;
+        continue;
+      }
+      // Store as a persistent data URL so refresh works.
+      accepted.push(await readFileAsDataUrl(file));
+    }
+
+    if (rejectedForSize > 0) {
+      setErrors((prev) => ({
+        ...prev,
+        images: `Some images were too large (max ${Math.floor(MAX_IMAGE_SIZE_BYTES / (1024 * 1024))}MB each).`,
+      }));
+    } else if (errors.images) {
+      setErrors((prev) => ({ ...prev, images: "" }));
+    }
+
+    if (accepted.length > 0) {
+      setImages((prev) => [...prev, ...accepted].slice(0, MAX_IMAGES));
+    }
+
+    // Allows selecting the same file again.
+    e.target.value = "";
   };
 
   const removeImage = (index: number) => {
@@ -37,12 +80,18 @@ export default function PostItemPage() {
     const newErrors: Record<string, string> = {};
 
     if (!formData.title.trim()) newErrors.title = "Title is required";
+    if (formData.title.trim() && formData.title.trim().length < 3) {
+      newErrors.title = "Title must be at least 3 characters";
+    }
     if (!formData.category) newErrors.category = "Category is required";
     if (!formData.price || isNaN(Number(formData.price)) || Number(formData.price) <= 0) {
       newErrors.price = "Valid price is required";
     }
     if (!formData.location) newErrors.location = "Location is required";
     if (!formData.description.trim()) newErrors.description = "Description is required";
+    if (formData.description.trim() && formData.description.trim().length < 10) {
+      newErrors.description = "Description must be at least 10 characters";
+    }
     if (images.length === 0) newErrors.images = "At least one image is required";
 
     setErrors(newErrors);
@@ -79,7 +128,11 @@ export default function PostItemPage() {
         alert("Listing posted successfully!");
         router.push("/home");
       } else {
-        alert(data.error || "Failed to post listing");
+        if (Array.isArray(data?.errors) && data.errors.length > 0) {
+          alert(`${data.error || "Validation failed"}:\n- ${data.errors.join("\n- ")}`);
+        } else {
+          alert(data.error || "Failed to post listing");
+        }
       }
     } catch (error) {
       console.error('Error posting listing:', error);

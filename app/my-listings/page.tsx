@@ -1,65 +1,96 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
-const MOCK_USER_LISTINGS = [
-  {
-    id: 1,
-    title: "iPhone 13 Pro - Excellent Condition",
-    price: 45000,
-    image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23667eea' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'%3EiPhone 13%3C/text%3E%3C/svg%3E",
-    status: "active",
-    views: 234,
-    chats: 12,
-    postedDate: "2 days ago",
-    category: "Electronics"
-  },
-  {
-    id: 2,
-    title: "MacBook Pro 16 inch M1",
-    price: 120000,
-    image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%234facfe' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'%3EMacBook Pro%3C/text%3E%3C/svg%3E",
-    status: "sold",
-    views: 567,
-    chats: 28,
-    postedDate: "1 week ago",
-    category: "Electronics"
-  },
-  {
-    id: 3,
-    title: "Office Chair - Herman Miller",
-    price: 15000,
-    image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23764ba2' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'%3EOffice Chair%3C/text%3E%3C/svg%3E",
-    status: "active",
-    views: 89,
-    chats: 5,
-    postedDate: "3 days ago",
-    category: "Furniture"
-  }
-];
+type ListingStatus = "active" | "sold" | "deleted";
+
+type Listing = {
+  _id: string;
+  title: string;
+  price: number;
+  category: string;
+  status: ListingStatus;
+  views?: number;
+  images: string[];
+  createdAt: string;
+};
+
+const FALLBACK_IMAGE =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23667eea' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'%3ENo Image%3C/text%3E%3C/svg%3E";
 
 export default function MyListingsPage() {
-  const [listings, setListings] = useState(MOCK_USER_LISTINGS);
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "active" | "sold">("all");
-  const [showDeleteModal, setShowDeleteModal] = useState<number | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState<string | null>(null);
+
+  const fetchListings = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("/api/listings?status=all");
+      const data = await response.json();
+      if (data?.success && Array.isArray(data.listings)) {
+        setListings(data.listings);
+      } else {
+        setListings([]);
+      }
+    } catch (error) {
+      console.error("Error fetching listings:", error);
+      setListings([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchListings();
+  }, []);
 
   const filteredListings = listings.filter((listing) => {
     if (filter === "all") return true;
     return listing.status === filter;
   });
 
-  const handleMarkAsSold = (id: number) => {
-    setListings((prev) =>
-      prev.map((listing) =>
-        listing.id === id ? { ...listing, status: "sold" as const } : listing
-      )
-    );
+  const handleMarkAsSold = async (id: string) => {
+    try {
+      const response = await fetch(`/api/listings/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "sold" }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        alert(data?.error || "Failed to mark as sold");
+        return;
+      }
+
+      await fetchListings();
+    } catch (error) {
+      console.error("Error marking as sold:", error);
+      alert("Failed to mark as sold");
+    }
   };
 
-  const handleDelete = (id: number) => {
-    setListings((prev) => prev.filter((listing) => listing.id !== id));
-    setShowDeleteModal(null);
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await fetch(`/api/listings/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        alert(data?.error || "Failed to delete listing");
+        return;
+      }
+
+      setShowDeleteModal(null);
+      await fetchListings();
+    } catch (error) {
+      console.error("Error deleting listing:", error);
+      alert("Failed to delete listing");
+    }
   };
 
   const activeCount = listings.filter((l) => l.status === "active").length;
@@ -131,7 +162,15 @@ export default function MyListingsPage() {
 
       {/* Listings */}
       <main className="max-w-7xl mx-auto px-4 py-6">
-        {filteredListings.length === 0 ? (
+        {isLoading ? (
+          <div className="text-center py-12">
+            <svg className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            <p className="text-gray-500">Loading your listings...</p>
+          </div>
+        ) : filteredListings.length === 0 ? (
           <div className="text-center py-12">
             <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
@@ -148,12 +187,12 @@ export default function MyListingsPage() {
         ) : (
           <div className="space-y-4">
             {filteredListings.map((listing) => (
-              <div key={listing.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div key={listing._id} className="bg-white rounded-xl shadow-sm overflow-hidden">
                 <div className="flex flex-col sm:flex-row">
                   {/* Image */}
                   <div className="relative h-48 sm:h-auto sm:w-48 bg-gray-200 flex-shrink-0">
                     <img
-                      src={listing.image}
+                      src={listing.images?.[0] || FALLBACK_IMAGE}
                       alt={listing.title}
                       className="w-full h-full object-cover"
                     />
@@ -180,16 +219,10 @@ export default function MyListingsPage() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
-                            <span>{listing.views} views</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                            </svg>
-                            <span>{listing.chats} chats</span>
+                            <span>{listing.views ?? 0} views</span>
                           </div>
                           <span className="text-gray-400">•</span>
-                          <span>{listing.postedDate}</span>
+                          <span>{new Date(listing.createdAt).toLocaleDateString()}</span>
                         </div>
                       </div>
                       <span className={`ml-3 px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
@@ -204,27 +237,27 @@ export default function MyListingsPage() {
                     {/* Actions */}
                     <div className="flex flex-wrap gap-2">
                       <Link
-                        href={`/item/${listing.id}`}
+                        href={`/item/${listing._id}`}
                         className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                       >
                         View
                       </Link>
                       <Link
-                        href={`/post?edit=${listing.id}`}
+                        href={`/post?edit=${listing._id}`}
                         className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                       >
                         Edit
                       </Link>
                       {listing.status === "active" && (
                         <button
-                          onClick={() => handleMarkAsSold(listing.id)}
+                          onClick={() => handleMarkAsSold(listing._id)}
                           className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
                         >
                           Mark as Sold
                         </button>
                       )}
                       <button
-                        onClick={() => setShowDeleteModal(listing.id)}
+                        onClick={() => setShowDeleteModal(listing._id)}
                         className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
                       >
                         Delete

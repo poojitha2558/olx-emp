@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-const CATEGORIES = ["All", "Electronics", "Furniture", "Vehicles", "Books", "Misc"];
+const CATEGORIES = ["All", "Electronics", "Furniture", "Vehicles", "Books", "Jewelry", "Misc"];
 
 interface Listing {
   _id: string;
